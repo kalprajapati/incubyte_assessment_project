@@ -1,0 +1,41 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "\"Nodejs server with vanilla javascript\"",
+  "homepage": "https://github.com/kalprajapati/incubyte_assessment_project#readme",
+  "bugs": {
+    "url": "https://github.com/kalprajapati/incubyte_assessment_project/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalprajapati/incubyte_assessment_project.git"
+  },
+  "license": "ISC",
+  "author": "\"Kalp Prajapati\"",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.0",
+    "morgan": "^1.11.0"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "unrs-resolver@1.12.2": true
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
+  }
+}
