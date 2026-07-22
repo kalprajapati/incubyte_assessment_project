@@ -3,9 +3,11 @@ const mongoose = require('mongoose');
 const app = require('../app');
 const User = require('../models/User');
 
+jest.setTimeout(30000);
+
 describe('Auth API Integration Tests', () => {
   beforeAll(async () => {
-    const mongoUri = process.env.MONGODB_URI_TEST || 'mongodb://127.0.0.1:27017/car_dealership_auth_test';
+    const mongoUri = process.env.MONGODB_URI;
     await mongoose.connect(mongoUri);
   });
 
