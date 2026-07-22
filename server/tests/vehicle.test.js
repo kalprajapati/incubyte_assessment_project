@@ -84,6 +84,77 @@ describe('Vehicle API Integration Tests', () => {
     });
   });
 
+  describe('GET /api/vehicles/search', () => {
+    beforeEach(async () => {
+      await Vehicle.create([
+        { make: 'Honda', model: 'Civic', category: 'Sedan', price: 22000, quantity: 4 },
+        { make: 'Honda', model: 'CR-V', category: 'SUV', price: 32000, quantity: 2 },
+        { make: 'BMW', model: 'M4', category: 'Coupe', price: 75000, quantity: 1 },
+        { make: 'Tesla', model: 'Model 3', category: 'Electric', price: 42000, quantity: 3 },
+      ]);
+    });
+
+    it('should filter vehicles by make, category, and price range with pagination', async () => {
+      const res = await request(app)
+        .get('/api/vehicles/search')
+        .query({
+          make: 'Honda',
+          category: 'Sedan',
+          minPrice: 20000,
+          maxPrice: 25000,
+          page: 1,
+          limit: 10,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('vehicles');
+      expect(res.body.data).toHaveProperty('pagination');
+      expect(res.body.data.vehicles).toHaveLength(1);
+      expect(res.body.data.vehicles[0]).toHaveProperty('model', 'Civic');
+      expect(res.body.data.pagination).toEqual({
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+    });
+
+    it('should filter vehicles with multiple combined parameters (minPrice & maxPrice)', async () => {
+      const res = await request(app)
+        .get('/api/vehicles/search')
+        .query({
+          minPrice: 30000,
+          maxPrice: 50000,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.vehicles).toHaveLength(2); // Honda CR-V (32k), Tesla Model 3 (42k)
+    });
+
+    it('should return empty list when no vehicles match query', async () => {
+      const res = await request(app)
+        .get('/api/vehicles/search')
+        .query({ make: 'Porsche' });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.vehicles).toHaveLength(0);
+      expect(res.body.data.pagination.total).toBe(0);
+    });
+
+    it('should reject invalid query parameters (e.g., negative minPrice)', async () => {
+      const res = await request(app)
+        .get('/api/vehicles/search')
+        .query({ minPrice: -50 });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toHaveProperty('details');
+    });
+  });
+
   describe('POST /api/vehicles', () => {
     it('should allow Admin to create a vehicle', async () => {
       const newVehicle = {

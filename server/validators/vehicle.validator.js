@@ -1,4 +1,4 @@
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 const createVehicleValidator = [
   body('make').trim().notEmpty().withMessage('Make is required'),
@@ -31,8 +31,31 @@ const vehicleIdValidator = [
   param('id').isMongoId().withMessage('Invalid vehicle ID format'),
 ];
 
+const searchVehicleValidator = [
+  query('make').optional().trim().isString().withMessage('Make must be a string'),
+  query('model').optional().trim().isString().withMessage('Model must be a string'),
+  query('category').optional().trim().isString().withMessage('Category must be a string'),
+  query('minPrice')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Minimum price must be a number greater than or equal to 0'),
+  query('maxPrice')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Maximum price must be a number greater than or equal to 0'),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer starting from 1'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be an integer between 1 and 100'),
+];
+
 module.exports = {
   createVehicleValidator,
   updateVehicleValidator,
   vehicleIdValidator,
+  searchVehicleValidator,
 };

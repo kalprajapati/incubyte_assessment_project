@@ -11,6 +11,15 @@ class VehicleController {
     }
   }
 
+  async searchVehicles(req, res, next) {
+    try {
+      const result = await vehicleService.searchVehicles(req.query);
+      return ApiResponse.send(res, 200, 'Vehicles retrieved successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getVehicleById(req, res, next) {
     try {
       const vehicle = await vehicleService.getVehicleById(req.params.id);

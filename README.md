@@ -117,6 +117,7 @@ npm run dev
 
 ## 🏛️ Architecture & Best Practices
 
+- **Global Currency Standard**: Indian Rupee (INR - ₹) is enforced across all financial models, test suites, and UI components.
 - **Clean Layered Architecture**: Routes → Middlewares → Controllers → Services → Models.
 - **Centralized Error Handling**: Standardized JSON responses for both success and error states.
 - **Role-Based Access Control**: Strict role enforcement (`Admin` vs `User`).
