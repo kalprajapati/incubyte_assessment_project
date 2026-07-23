@@ -1,17 +1,82 @@
 import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import { ROLES, ROUTES } from './utils/constants';
 
-function App() {
-  return (
-    <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-slate-800 p-8 rounded-2xl shadow-xl border border-slate-700 text-center">
-        <h1 className="text-3xl font-bold text-indigo-400 mb-2">Car Dealership Inventory</h1>
-        <p className="text-slate-400 text-sm mb-6">Scalable MERN Stack Monorepo Initialized</p>
-        <span className="inline-block px-4 py-1.5 bg-indigo-500/10 text-indigo-400 rounded-full text-xs font-semibold border border-indigo-500/20">
-          Ready for Feature Implementation
-        </span>
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import SearchPage from './pages/SearchPage';
+import AdminPage from './pages/AdminPage';
+import ProtectedRoute from './components/ProtectedRoute';
+
+/**
+ * PublicOnlyRoute — redirects already-authenticated users away
+ * from /login and /register to the home dashboard.
+ */
+function PublicOnlyRoute({ children }) {
+  const { user, hydrating } = useAuth();
+
+  if (hydrating) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
-    </div>
-  );
+    );
+  }
+
+  return user ? <Navigate to={ROUTES.HOME} replace /> : children;
 }
 
-export default App;
+export default function App() {
+  return (
+    <Routes>
+      {/* Public-only routes (redirect if already logged in) */}
+      <Route
+        path={ROUTES.LOGIN}
+        element={
+          <PublicOnlyRoute>
+            <LoginPage />
+          </PublicOnlyRoute>
+        }
+      />
+      <Route
+        path={ROUTES.REGISTER}
+        element={
+          <PublicOnlyRoute>
+            <RegisterPage />
+          </PublicOnlyRoute>
+        }
+      />
+
+      {/* Protected routes */}
+      <Route
+        path={ROUTES.HOME}
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.VEHICLES}
+        element={
+          <ProtectedRoute>
+            <SearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.ADMIN}
+        element={
+          <ProtectedRoute roles={[ROLES.ADMIN]}>
+            <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all — redirect to login */}
+      <Route path={ROUTES.NOT_FOUND} element={<Navigate to={ROUTES.LOGIN} replace />} />
+    </Routes>
+  );
+}
