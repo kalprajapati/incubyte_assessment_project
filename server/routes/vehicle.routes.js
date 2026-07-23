@@ -6,6 +6,7 @@ const {
   updateVehicleValidator,
   vehicleIdValidator,
   searchVehicleValidator,
+  restockVehicleValidator,
 } = require('../validators/vehicle.validator');
 const validate = require('../middlewares/validate.middleware');
 const { authenticate } = require('../middlewares/auth.middleware');
@@ -41,6 +42,24 @@ router.delete(
   vehicleIdValidator,
   validate,
   vehicleController.deleteVehicle
+);
+
+// Inventory routes
+router.post(
+  '/:id/purchase',
+  authenticate,
+  vehicleIdValidator,
+  validate,
+  vehicleController.purchaseVehicle
+);
+
+router.post(
+  '/:id/restock',
+  authenticate,
+  authorizeRoles('Admin'),
+  restockVehicleValidator,
+  validate,
+  vehicleController.restockVehicle
 );
 
 module.exports = router;

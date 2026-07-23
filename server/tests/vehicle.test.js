@@ -260,4 +260,62 @@ describe('Vehicle API Integration Tests', () => {
       expect(res.body.success).toBe(false);
     });
   });
+  describe('POST /api/vehicles/:id/purchase', () => {
+    it('should allow purchasing a vehicle and decrease quantity by 1', async () => {
+      const res = await request(app)
+        .post(`/api/vehicles/${testVehicle._id}/purchase`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.quantity).toBe(testVehicle.quantity - 1);
+    });
+
+    it('should return error when purchasing an out of stock vehicle', async () => {
+      // First, update vehicle quantity to 0
+      await Vehicle.findByIdAndUpdate(testVehicle._id, { quantity: 0 });
+
+      const res = await request(app)
+        .post(`/api/vehicles/${testVehicle._id}/purchase`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/out of stock/i);
+    });
+  });
+
+  describe('POST /api/vehicles/:id/restock', () => {
+    it('should allow Admin to restock a vehicle and increase quantity', async () => {
+      const res = await request(app)
+        .post(`/api/vehicles/${testVehicle._id}/restock`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ quantity: 5 });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.quantity).toBe(testVehicle.quantity + 5);
+    });
+
+    it('should forbid regular user from restocking vehicle (403 Forbidden)', async () => {
+      const res = await request(app)
+        .post(`/api/vehicles/${testVehicle._id}/restock`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({ quantity: 5 });
+
+      expect(res.statusCode).toEqual(403);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should reject invalid restock quantity', async () => {
+      const res = await request(app)
+        .post(`/api/vehicles/${testVehicle._id}/restock`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ quantity: -2 });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toHaveProperty('details');
+    });
+  });
 });

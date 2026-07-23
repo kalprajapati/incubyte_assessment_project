@@ -1,4 +1,5 @@
 const vehicleService = require('../services/vehicle.service');
+const inventoryService = require('../services/inventory.service');
 const ApiResponse = require('../utils/apiResponse');
 
 class VehicleController {
@@ -51,6 +52,24 @@ class VehicleController {
     try {
       await vehicleService.deleteVehicle(req.params.id);
       return ApiResponse.send(res, 200, 'Vehicle deleted successfully', null);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async purchaseVehicle(req, res, next) {
+    try {
+      const vehicle = await inventoryService.purchaseVehicle(req.params.id);
+      return ApiResponse.send(res, 200, 'Vehicle purchased successfully', vehicle);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async restockVehicle(req, res, next) {
+    try {
+      const vehicle = await inventoryService.restockVehicle(req.params.id, req.body.quantity);
+      return ApiResponse.send(res, 200, 'Vehicle restocked successfully', vehicle);
     } catch (error) {
       next(error);
     }

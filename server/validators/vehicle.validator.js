@@ -53,9 +53,19 @@ const searchVehicleValidator = [
     .withMessage('Limit must be an integer between 1 and 100'),
 ];
 
+const restockVehicleValidator = [
+  param('id').isMongoId().withMessage('Invalid vehicle ID format'),
+  body('quantity')
+    .notEmpty()
+    .withMessage('Quantity is required')
+    .isInt({ min: 1 })
+    .withMessage('Quantity must be a positive integer'),
+];
+
 module.exports = {
   createVehicleValidator,
   updateVehicleValidator,
   vehicleIdValidator,
   searchVehicleValidator,
+  restockVehicleValidator,
 };
